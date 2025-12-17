@@ -1,0 +1,28 @@
+# Foundry
+/out/
+/cache/
+/lib/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Broadcast files (deployment artifacts)
+/broadcast/
+
+# Coverage
+lcov.info
+coverage/

@@ -1,0 +1,31 @@
+{
+  "name": "zero-g-unstake",
+  "version": "1.0.0",
+  "description": "Gasless Emergency Exit - EIP-7702 powered unstaking on BSC",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "relayer": "npx ts-node scripts/relayer.ts",
+    "sign": "npx ts-node scripts/userSign.ts",
+    "status": "npx ts-node scripts/checkStatus.ts",
+    "demo": "npx ts-node scripts/demo.ts"
+  },
+  "keywords": [
+    "eip-7702",
+    "bsc",
+    "account-abstraction",
+    "defi",
+    "staking"
+  ],
+  "author": "Zero-G Unstake Team",
+  "license": "MIT",
+  "dependencies": {
+    "viem": "^2.21.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
+  }
+}
