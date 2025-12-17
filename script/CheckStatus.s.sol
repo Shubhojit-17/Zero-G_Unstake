@@ -36,7 +36,7 @@ contract CheckStatus is Script {
         console.log("\n--- Vault Configuration ---");
         console.log("Staking Token:", vault.stakingToken());
         console.log("Lock Duration:", vault.lockDuration(), "seconds");
-        console.log("Relayer Fee:", delegate.getRelayerFeeBps(), "bps (", delegate.getRelayerFeeBps() / 100, "%)");
+        console.log("Relayer Fee (bps):", delegate.getRelayerFeeBps());
 
         console.log("\n--- Account Balances ---");
         console.log("Deployer:", deployer);

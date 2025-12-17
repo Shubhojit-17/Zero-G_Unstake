@@ -100,9 +100,9 @@ contract StakingVault is IStakingVault {
      * @notice Get stake info for a user
      * @param user The address to query
      * @return amount The staked amount
-     * @return unlockTime The unlock timestamp
+     * @return unlockAt The unlock timestamp
      */
-    function stakes(address user) external view override returns (uint256 amount, uint256 unlockTime) {
+    function stakes(address user) external view override returns (uint256 amount, uint256 unlockAt) {
         StakeInfo storage stakeInfo = _stakes[user];
         return (stakeInfo.amount, stakeInfo.unlockTime);
     }

@@ -300,11 +300,18 @@ contract ZeroGUnstakeTest is Test {
         // Bound stake amount to reasonable range
         stakeAmount = bound(stakeAmount, 1e18, USER_TOKENS);
 
+        // Record user balance before staking
+        uint256 userBalanceBefore = token.balanceOf(user);
+
         // Stake
         vm.startPrank(user);
         token.approve(address(vault), stakeAmount);
         vault.stake(stakeAmount);
         vm.stopPrank();
+
+        // User's remaining balance after staking
+        uint256 userBalanceAfterStake = token.balanceOf(user);
+        assertEq(userBalanceAfterStake, userBalanceBefore - stakeAmount, "User balance after stake");
 
         // Warp past lock
         vm.warp(block.timestamp + LOCK_DURATION + 1);
@@ -322,8 +329,11 @@ contract ZeroGUnstakeTest is Test {
         );
 
         // Verify fee calculation
+        // Fee is calculated on the RECEIVED amount (stakeAmount), not total balance
         uint256 expectedFee = stakeAmount / 100;
+        uint256 expectedUserFinal = userBalanceAfterStake + stakeAmount - expectedFee;
+        
         assertEq(token.balanceOf(relayer), expectedFee, "Fee should be 1%");
-        assertEq(token.balanceOf(user), stakeAmount - expectedFee, "User gets rest");
+        assertEq(token.balanceOf(user), expectedUserFinal, "User gets stake minus fee plus previous balance");
     }
 }
