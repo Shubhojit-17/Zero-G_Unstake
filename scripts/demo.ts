@@ -6,7 +6,7 @@
  * 2. Wait: Time passes, lock expires
  * 3. Problem: User has 0 BNB, cannot unstake
  * 4. Solution: User signs EIP-7702 authorization
- * 5. Rescue: Relayer submits transaction, user gets tokens
+ * 5. Rescue: Relayer submits transaction, user gets tokens (MEV-protected)
  * 
  * Usage: npm run demo
  * 
@@ -33,6 +33,7 @@ import {
   UnstakeDelegateABI,
   ZeroGTokenABI,
 } from './utils/abis';
+import { createMevProtectedRelayer } from './utils/mevProtection';
 
 const publicClient = createPublicClient({
   chain: sepolia,
@@ -273,7 +274,7 @@ async function main() {
 
   // Execute rescue
   console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('🚀 PHASE 6: Relayer Executes Rescue');
+  console.log('🚀 PHASE 6: Relayer Executes Rescue (MEV-Protected)');
   console.log('═══════════════════════════════════════════════════════════════');
 
   const relayerBalanceBefore = await publicClient.readContract({
@@ -286,7 +287,14 @@ async function main() {
   console.log(`\n   Relayer BNB: ${formatEther(await publicClient.getBalance({ address: relayer.address }))} tBNB`);
   console.log(`   Relayer ZGT: ${formatEther(relayerBalanceBefore)} ZGT`);
 
-  console.log('\n   Submitting EIP-7702 rescue transaction...');
+  console.log('\n   Submitting EIP-7702 rescue transaction with MEV protection...');
+
+  // Create MEV-protected relayer
+  const mevRelayer = createMevProtectedRelayer(relayer, sepolia, {
+    enabled: true,
+    provider: 'mev-blocker',
+    fallbackToPublic: true,
+  });
 
   // Encode the rescue call
   const rescueCallData = encodeFunctionData({
@@ -295,20 +303,21 @@ async function main() {
     args: [contracts.vault, relayer.address, estFee * 2n], // 2x fee as max
   });
 
-  // Submit the transaction with authorization list
+  // Submit the transaction with authorization list using MEV protection
   // EIP-7702 transactions require more gas than regular transactions
-  const rescueTxHash = await relayerWallet.sendTransaction({
+  const rescueResult = await mevRelayer.sendProtectedTransaction({
     to: user.address, // Call the user's EOA (which has delegate code via 7702)
     data: rescueCallData,
     authorizationList: [authorization],
     gas: 500000n, // EIP-7702 transactions need more gas
   });
 
-  console.log(`   Transaction Hash: ${rescueTxHash}`);
+  console.log(`   Transaction Hash: ${rescueResult.hash}`);
+  console.log(`   MEV Protected: ${rescueResult.wasProtected ? '✅ Yes' : '⚠️ No (testnet)'}`);
   console.log('   Waiting for confirmation...');
 
   const receipt = await publicClient.waitForTransactionReceipt({
-    hash: rescueTxHash,
+    hash: rescueResult.hash,
   });
 
   if (receipt.status === 'success') {
@@ -357,11 +366,12 @@ async function main() {
   console.log('   • Relayer paid the gas and was reimbursed in ZGT');
   console.log('   • Everything happened in ONE atomic transaction');
   console.log('   • EIP-7702 enabled the "gasless" experience');
+  console.log('   • MEV protection prevented front-running attacks');
 
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('✅ Demo Complete! Zero-G Unstake Works!');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`\n   View on BSCScan: https://sepolia.etherscan.io/tx/${rescueTxHash}`);
+  console.log(`\n   View on Etherscan: https://sepolia.etherscan.io/tx/${rescueResult.hash}`);
 }
 
 main().catch(console.error);

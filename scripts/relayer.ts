@@ -4,10 +4,14 @@
  * This script runs the relayer bot that:
  * 1. Monitors for rescue requests (signed EIP-7702 authorizations)
  * 2. Validates the rescue can be executed
- * 3. Submits the transaction with the authorization list
+ * 3. Submits the transaction with the authorization list (MEV-protected)
  * 4. Pays gas upfront and gets reimbursed in tokens
  * 
  * Usage: npm run relayer
+ * 
+ * MEV Protection:
+ * - Uses private mempools when available (Flashbots/MEV Blocker)
+ * - Automatically falls back to public mempool on testnets
  */
 
 import {
@@ -30,6 +34,10 @@ import {
   UnstakeDelegateABI,
   ZeroGTokenABI,
 } from './utils/abis';
+import {
+  createMevProtectedRelayer,
+  type MevProtectionConfig,
+} from './utils/mevProtection';
 
 // Types for EIP-7702
 interface SignedAuthorization {
@@ -139,14 +147,24 @@ async function validateRescueRequest(request: RescueRequest): Promise<{
   }
 }
 
+// MEV Protection configuration (can be overridden via environment)
+const mevConfig: Partial<MevProtectionConfig> = {
+  enabled: process.env.MEV_PROTECTION !== 'false', // Enabled by default
+  provider: (process.env.MEV_PROVIDER as 'flashbots' | 'mev-blocker' | 'public') || 'mev-blocker',
+  fallbackToPublic: true,
+  maxRetries: 3,
+};
+
 /**
  * Execute a rescue transaction with EIP-7702 authorization
+ * Uses MEV protection to prevent front-running/sandwich attacks
  */
 async function executeRescue(request: RescueRequest): Promise<{
   success: boolean;
   txHash?: Hex;
   receipt?: TransactionReceipt;
   error?: string;
+  mevProtected?: boolean;
 }> {
   const contracts = getContractAddresses();
 
@@ -156,6 +174,9 @@ async function executeRescue(request: RescueRequest): Promise<{
   console.log(`   Max Fee: ${formatEther(request.maxFee)} ZGT`);
 
   try {
+    // Create MEV-protected relayer
+    const protectedRelayer = createMevProtectedRelayer(relayerAccount, sepolia, mevConfig);
+    
     // Encode the executeRescue call data
     const callData = encodeFunctionData({
       abi: UnstakeDelegateABI,
@@ -163,37 +184,43 @@ async function executeRescue(request: RescueRequest): Promise<{
       args: [request.vaultAddress, relayerAccount.address, request.maxFee],
     });
 
-    // Build the EIP-7702 transaction
+    // Build the EIP-7702 transaction with MEV protection
     // The transaction is sent TO the user's address (which will have delegate code)
     // The authorizationList contains the signed delegation
-    const txHash = await walletClient.sendTransaction({
+    const result = await protectedRelayer.sendProtectedTransaction({
       to: request.userAddress,
       data: callData,
+      gas: 500000n, // EIP-7702 transactions need more gas
       authorizationList: [
         {
-          contractAddress: request.authorization.contractAddress,
+          address: request.authorization.contractAddress,
           chainId: request.authorization.chainId,
-          nonce: request.authorization.nonce,
+          nonce: Number(request.authorization.nonce),
           r: request.authorization.r,
           s: request.authorization.s,
-          v: request.authorization.v,
-          // Note: yParity might be needed instead of v depending on viem version
+          yParity: request.authorization.v === 27 ? 0 : 1,
         },
-      ],
+      ] as any,
     });
 
-    console.log(`   ✅ Transaction submitted: ${txHash}`);
+    console.log(`   ✅ Transaction submitted: ${result.hash}`);
+    console.log(`   🛡️  MEV Protected: ${result.wasProtected ? 'Yes' : 'No'}`);
 
     // Wait for confirmation
     const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txHash,
+      hash: result.hash,
     });
 
     if (receipt.status === 'success') {
       console.log(`   ✅ Transaction confirmed in block ${receipt.blockNumber}`);
-      return { success: true, txHash, receipt };
+      return { 
+        success: true, 
+        txHash: result.hash, 
+        receipt,
+        mevProtected: result.wasProtected,
+      };
     } else {
-      return { success: false, txHash, error: 'Transaction reverted' };
+      return { success: false, txHash: result.hash, error: 'Transaction reverted' };
     }
   } catch (error) {
     console.error(`   ❌ Transaction failed:`, error);
