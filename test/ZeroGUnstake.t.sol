@@ -135,6 +135,132 @@ contract ZeroGUnstakeTest is Test {
         assertEq(delegate.getRelayerFeeBps(), 100);
     }
 
+    // ============ TIMING ACCURACY TESTS (Hackathon Criteria) ============
+
+    /**
+     * @notice Test that unstake fails exactly 1 second BEFORE lock expiry
+     * @dev Demonstrates block-accurate timing - fails at unlockTime - 1
+     */
+    function test_UnstakeFailsOneSecondBeforeExpiry() public {
+        uint256 stakeTime = block.timestamp;
+        
+        // Stake tokens
+        vm.startPrank(user);
+        token.approve(address(vault), USER_TOKENS);
+        vault.stake(USER_TOKENS);
+        vm.stopPrank();
+
+        uint256 expectedUnlockTime = stakeTime + LOCK_DURATION;
+
+        // Warp to exactly 1 second BEFORE unlock
+        vm.warp(expectedUnlockTime - 1);
+
+        // Should still be locked
+        assertFalse(vault.canUnstake(user));
+        
+        // Unstake should revert
+        vm.prank(user);
+        vm.expectRevert();
+        vault.unstake();
+    }
+
+    /**
+     * @notice Test that unstake succeeds EXACTLY at lock expiry (block-accurate)
+     * @dev Demonstrates precision: succeeds at block.timestamp == unlockTime
+     */
+    function test_UnstakeSucceedsExactlyAtExpiry() public {
+        uint256 stakeTime = block.timestamp;
+        
+        // Stake tokens
+        vm.startPrank(user);
+        token.approve(address(vault), USER_TOKENS);
+        vault.stake(USER_TOKENS);
+        vm.stopPrank();
+
+        uint256 expectedUnlockTime = stakeTime + LOCK_DURATION;
+
+        // Warp to EXACTLY the unlock time (not +1)
+        vm.warp(expectedUnlockTime);
+
+        // Should be unlocked
+        assertTrue(vault.canUnstake(user));
+        
+        // Unstake should succeed
+        vm.prank(user);
+        vault.unstake();
+
+        // Verify tokens returned
+        assertEq(token.balanceOf(user), USER_TOKENS);
+        assertEq(vault.stakedBalance(user), 0);
+    }
+
+    /**
+     * @notice Test rescue via delegate at exact unlock moment
+     * @dev Demonstrates EIP-7702 rescue works at precise unlock time
+     */
+    function test_RescueSucceedsExactlyAtExpiry() public {
+        uint256 stakeTime = block.timestamp;
+        
+        // Stake tokens
+        vm.startPrank(user);
+        token.approve(address(vault), USER_TOKENS);
+        vault.stake(USER_TOKENS);
+        vm.stopPrank();
+
+        uint256 expectedUnlockTime = stakeTime + LOCK_DURATION;
+
+        // Warp to EXACTLY the unlock time
+        vm.warp(expectedUnlockTime);
+
+        // Get balance before rescue
+        uint256 balanceBefore = token.balanceOf(user);
+
+        // Simulate EIP-7702 delegated call from user's address
+        vm.etch(user, address(delegate).code);
+        
+        vm.prank(user);
+        UnstakeDelegate(user).executeRescue(
+            address(vault),
+            relayer,
+            USER_TOKENS // max fee in tokens
+        );
+
+        // Verify rescue succeeded at exact unlock moment
+        uint256 expectedFee = USER_TOKENS / 100; // 1%
+        uint256 balanceAfter = token.balanceOf(user);
+        assertEq(balanceAfter - balanceBefore, USER_TOKENS - expectedFee);
+        assertEq(token.balanceOf(relayer), expectedFee);
+    }
+
+    /**
+     * @notice Test rescue fails 1 second before unlock
+     * @dev Demonstrates precision: rescue fails at unlockTime - 1
+     */
+    function test_RescueFailsOneSecondBeforeExpiry() public {
+        uint256 stakeTime = block.timestamp;
+        
+        // Stake tokens
+        vm.startPrank(user);
+        token.approve(address(vault), USER_TOKENS);
+        vault.stake(USER_TOKENS);
+        vm.stopPrank();
+
+        uint256 expectedUnlockTime = stakeTime + LOCK_DURATION;
+
+        // Warp to 1 second BEFORE unlock
+        vm.warp(expectedUnlockTime - 1);
+
+        // Simulate EIP-7702 delegated call
+        vm.etch(user, address(delegate).code);
+        
+        // Should revert because still locked
+        vm.prank(user);
+        vm.expectRevert();
+        UnstakeDelegate(user).executeRescue(address(vault), relayer, USER_TOKENS);
+    }
+
+    // ============ Original Delegate Tests ============
+
     function test_EstimateRescue() public {
         // Stake tokens
         vm.startPrank(user);
