@@ -261,16 +261,92 @@ npx ts-node scripts/relayer.ts
 
 ---
 
-## 🛣️ Roadmap
+## 🛣️ Features & Roadmap
 
+### ✅ Core Features (Complete)
 - [x] Core concept & architecture design
-- [ ] Smart contract implementation
-- [ ] Foundry test suite
-- [ ] Viem relayer integration
-- [ ] BSC Testnet deployment
-- [ ] Frontend demo UI
-- [ ] Security audit
-- [ ] Mainnet launch
+- [x] Smart contract implementation (ZeroGToken, StakingVault, UnstakeDelegate)
+- [x] Comprehensive Foundry test suite (14 tests passing)
+- [x] Viem-based relayer with EIP-7702 support
+- [x] Sepolia Testnet deployment & demo
+
+### ✅ Bonus Features (Complete)
+- [x] **MEV-Safe Execution** - Transactions routed through Flashbots/MEV Blocker
+- [x] **Auto-Unstake Bot** - Monitors users and auto-rescues when lock expires
+- [x] **One-Click Frontend** - React/Next.js UI with ConnectKit wallet integration
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- [Foundry](https://book.getfoundry.sh/) installed
+- [Node.js](https://nodejs.org/) v18+ (for Viem scripts)
+- Sepolia Testnet ETH (for relayer operations)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Shubhojit-17/Zero-G_Unstake.git
+cd Zero-G_Unstake
+
+# Install Foundry dependencies
+forge install
+
+# Install Node.js dependencies
+npm install
+```
+
+### Build & Test
+
+```bash
+# Compile contracts
+forge build
+
+# Run tests
+forge test -vvv
+```
+
+### Run Demo
+
+```bash
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your keys
+
+# Run the full demo
+npx tsx scripts/demo.ts
+```
+
+### Start Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Start Auto-Unstake Bot
+
+```bash
+# Register users for auto-rescue
+npx tsx scripts/autoUnstakeBot.ts register <user-address>
+
+# Start the bot
+npx tsx scripts/autoUnstakeBot.ts start
+```
+
+---
+
+## 📦 Deployed Contracts (Sepolia)
+
+| Contract | Address |
+|----------|---------|
+| ZeroGToken | `0xACDca6c55F4CBA946763413854341b9E5556212A` |
+| StakingVault | `0x5085d1DD5FbDA9166094C3a3dc41dea7Df8fD9e7` |
+| UnstakeDelegate | `0x8ca2A267D31989FE05111cd46326AFA6971607AF` |
 
 ---
 

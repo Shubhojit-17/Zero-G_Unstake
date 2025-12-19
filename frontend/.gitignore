@@ -1,0 +1,22 @@
+# Frontend build output
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Debug
+npm-debug.log*
+
+# Misc
+.DS_Store
+*.pem
