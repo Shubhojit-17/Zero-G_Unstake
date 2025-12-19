@@ -237,8 +237,25 @@ async function main() {
   console.log(`   ✅ Rescue request saved to: ${filename}`);
 
   console.log('\n📤 Next Steps:');
-  console.log('   1. Send this file to the relayer service');
-  console.log('   2. Or run: npm run relayer -- --request ./' + filename);
+  console.log('   Option A: Send request to relayer manually');
+  console.log('      1. Send this file to the relayer service');
+  console.log('      2. Or run: npm run relayer -- --request ./' + filename);
+  
+  console.log('\n   Option B: Register for auto-unstake bot');
+  console.log('      The bot will automatically rescue you when eligible.');
+  console.log('      Run this command to register:');
+  
+  // Create bot-compatible authorization format
+  const botAuth = {
+    address: request.authorization.contractAddress,
+    chainId: request.authorization.chainId,
+    nonce: Number(request.authorization.nonce),
+    r: request.authorization.r,
+    s: request.authorization.s,
+    yParity: Number(request.authorization.v) === 27 ? 0 : 1,
+  };
+  console.log(`\n      npm run bot register ${request.userAddress} '${JSON.stringify(botAuth)}'`);
+
   console.log('\n   The relayer will submit your rescue transaction and you');
   console.log('   will receive your tokens minus the 1% fee!');
 }

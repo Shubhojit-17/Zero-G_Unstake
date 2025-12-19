@@ -8,7 +8,10 @@
     "relayer": "npx ts-node scripts/relayer.ts",
     "sign": "npx ts-node scripts/userSign.ts",
     "status": "npx ts-node scripts/checkStatus.ts",
-    "demo": "npx ts-node scripts/demo.ts"
+    "demo": "npx ts-node scripts/demo.ts",
+    "bot": "npx ts-node scripts/autoUnstakeBot.ts",
+    "bot:status": "npx ts-node scripts/autoUnstakeBot.ts status",
+    "bot:check": "npx ts-node scripts/autoUnstakeBot.ts check"
   },
   "keywords": [
     "eip-7702",

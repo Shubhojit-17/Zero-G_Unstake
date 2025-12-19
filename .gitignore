@@ -12,6 +12,9 @@
 node_modules/
 dist/
 
+# Bot data (contains user authorizations)
+.bot-data/
+
 # IDE
 .vscode/
 .idea/
