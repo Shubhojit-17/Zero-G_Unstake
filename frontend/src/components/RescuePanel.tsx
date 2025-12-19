@@ -4,6 +4,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef, useCallback, useR
 import { useAccount, useReadContracts, useBalance } from 'wagmi';
 import { formatEther } from 'viem';
 import { CONTRACTS, StakingVaultABI, UnstakeDelegateABI, ERC20ABI, RELAYER_API } from '@/config/web3';
+import { useToast } from '@/components/Toast';
 
 type RescueStep = 'idle' | 'confirming' | 'submitting' | 'success' | 'error';
 
@@ -24,6 +25,7 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
 ) {
   const { address, isConnected } = useAccount();
   const { data: ethBalance, refetch: refetchBalance } = useBalance({ address });
+  const { showToast } = useToast();
 
   const [step, setStep] = useState<RescueStep>('idle');
   const [error, setError] = useState<string>('');
@@ -131,6 +133,9 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
       localStorage.removeItem(`${AUTO_RESCUE_KEY}-${address}`);
       setAutoRescueEnabled(false);
       
+      // Show success toast
+      showToast('🎉 Rescue successful! Tokens have been recovered.', 'success');
+      
       refetch();
       refetchBalance();
       if (onRescueComplete) {
@@ -142,8 +147,9 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
       setStep('error');
       setAutoRescueStatus('idle');
       autoRescueTriggered.current = false;
+      showToast('❌ Rescue failed. Please try again.', 'error');
     }
-  }, [address, refetch, refetchBalance, onRescueComplete]);
+  }, [address, refetch, refetchBalance, onRescueComplete, showToast]);
 
   // Calculate time values
   const now = BigInt(currentTime);
@@ -178,9 +184,11 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
         localStorage.setItem(`${AUTO_RESCUE_KEY}-${address}`, 'true');
         setAutoRescueStatus('waiting');
         autoRescueTriggered.current = false;
+        showToast('⏰ Auto-rescue enabled! Will trigger when lock expires.', 'info');
       } else {
         localStorage.removeItem(`${AUTO_RESCUE_KEY}-${address}`);
         setAutoRescueStatus('idle');
+        showToast('Auto-rescue disabled.', 'info');
       }
     }
   };
@@ -237,6 +245,8 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
       const result = await response.json();
       setTxHash(result.txHash);
       setStep('success');
+      // Show success toast
+      showToast('🎉 Rescue successful! Tokens have been recovered.', 'success');
       refetch(); // Refresh stake data
       refetchBalance(); // Refresh balance
       if (onRescueComplete) {
@@ -246,6 +256,7 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
       console.error('Rescue error:', err);
       setError(err.message || 'Failed to execute rescue');
       setStep('error');
+      showToast('❌ Rescue failed. Please try again.', 'error');
     }
   };
 

@@ -155,57 +155,78 @@ export const LiveActivityFeed = forwardRef<LiveActivityFeedRef>(function LiveAct
   if (events.length === 0) return null;
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          ⚡ Live Activity
-        </h3>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsPolling(!isPolling)}
-            className={`px-2 py-1 text-xs rounded ${isPolling ? 'bg-green-600' : 'bg-slate-600'}`}
-          >
-            {isPolling ? '🟢 Live' : '⏸️ Paused'}
-          </button>
-          <button
-            onClick={fetchAllEvents}
-            className="px-2 py-1 text-xs bg-slate-700 rounded hover:bg-slate-600"
-          >
-            🔄
-          </button>
+    <div className="card relative overflow-hidden">
+      {/* Subtle animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-blue-900/10 pointer-events-none" />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-lg">
+              ⚡
+            </span>
+            <span className="gradient-text">Live Activity</span>
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsPolling(!isPolling)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
+                isPolling 
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30' 
+                  : 'bg-slate-600/50 text-slate-400 border border-slate-600 hover:bg-slate-600'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${isPolling ? 'bg-green-400 animate-pulse' : 'bg-slate-400'}`} />
+              {isPolling ? 'Live' : 'Paused'}
+            </button>
+            <button
+              onClick={fetchAllEvents}
+              className="w-8 h-8 flex items-center justify-center bg-slate-700/50 rounded-lg border border-slate-600 hover:bg-slate-600 transition-all duration-200 hover:scale-105"
+            >
+              🔄
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-2 max-h-[300px] overflow-y-auto">
-        {events.map((event) => (
-          <div
-            key={event.id}
-            className="flex items-center justify-between p-2 bg-slate-800/50 rounded-lg text-sm"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{getEventIcon(event.type)}</span>
-              <div>
-                <span className={`font-medium ${getEventColor(event.type)}`}>
-                  {event.type.toUpperCase()}
-                </span>
-                <span className="text-slate-400 ml-2">
-                  {formatAddress(event.user)}
-                </span>
+        <div className="space-y-2 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent pr-1">
+          {events.map((event, index) => (
+            <div
+              key={event.id}
+              className="flex items-center justify-between p-3 bg-slate-800/30 backdrop-blur-sm rounded-xl text-sm border border-slate-700/50 hover:border-slate-600/50 transition-all duration-200 group hover:bg-slate-800/50"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
+                  event.type === 'stake' ? 'bg-blue-500/20 border border-blue-500/30' :
+                  event.type === 'unstake' ? 'bg-amber-500/20 border border-amber-500/30' :
+                  'bg-green-500/20 border border-green-500/30'
+                }`}>
+                  {getEventIcon(event.type)}
+                </div>
+                <div>
+                  <span className={`font-semibold tracking-wide ${getEventColor(event.type)}`}>
+                    {event.type.toUpperCase()}
+                  </span>
+                  <div className="flex items-center gap-1 text-slate-400 text-xs mt-0.5">
+                    <span className="font-mono">{formatAddress(event.user)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-mono font-semibold">{parseFloat(event.amount).toFixed(2)} <span className="text-purple-400">ZGT</span></div>
+                <a
+                  href={`https://sepolia.etherscan.io/tx/${event.txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-slate-500 hover:text-purple-400 transition-colors inline-flex items-center gap-1 group-hover:text-purple-400"
+                >
+                  Block #{event.blockNumber.toString()}
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                </a>
               </div>
             </div>
-            <div className="text-right">
-              <div className="font-mono">{parseFloat(event.amount).toFixed(2)} ZGT</div>
-              <a
-                href={`https://sepolia.etherscan.io/tx/${event.txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-purple-400 hover:text-purple-300"
-              >
-                Block #{event.blockNumber.toString()}
-              </a>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
