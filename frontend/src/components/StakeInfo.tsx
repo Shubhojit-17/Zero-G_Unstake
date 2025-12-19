@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState, useMemo } from 'react';
 import { useAccount, useReadContracts, useBalance } from 'wagmi';
 import { formatEther } from 'viem';
 import { CONTRACTS, StakingVaultABI, UnstakeDelegateABI, ERC20ABI } from '@/config/web3';
@@ -11,6 +12,15 @@ interface StakeInfoProps {
 export function StakeInfo({ onRescueClick }: StakeInfoProps) {
   const { address, isConnected } = useAccount();
   const { data: ethBalance } = useBalance({ address });
+  const [currentTime, setCurrentTime] = useState(Math.floor(Date.now() / 1000));
+
+  // Dynamic timer - updates every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Math.floor(Date.now() / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Read stake data
   const { data, isLoading, refetch } = useReadContracts({
@@ -48,6 +58,38 @@ export function StakeInfo({ onRescueClick }: StakeInfoProps) {
     ],
   });
 
+  // Parse data - do this before any conditional returns
+  const stakedBalance = data?.[0]?.result as bigint | undefined;
+  const unlockTime = data?.[1]?.result as bigint | undefined;
+  const canUnstake = data?.[2]?.result as boolean | undefined;
+  const tokenBalance = data?.[3]?.result as bigint | undefined;
+  const rescueEstimate = data?.[4]?.result as [bigint, bigint, bigint, boolean] | undefined;
+
+  // Calculate time values
+  const now = BigInt(currentTime);
+  const isLocked = unlockTime ? unlockTime > now : false;
+  const timeLeft = unlockTime ? Math.max(0, Number(unlockTime - now)) : 0;
+  const hasStake = stakedBalance && stakedBalance > 0n;
+  const hasLowGas = ethBalance && ethBalance.value < BigInt(1e15);
+
+  // Auto-refetch when lock expires - MUST be before conditional returns
+  useEffect(() => {
+    if (hasStake && !isLocked && timeLeft <= 0 && unlockTime && unlockTime > 0n) {
+      refetch();
+    }
+  }, [hasStake, isLocked, timeLeft, unlockTime, refetch]);
+
+  const formatTime = (seconds: number) => {
+    if (seconds <= 0) return 'Unlocked!';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
+  // Conditional returns AFTER all hooks
   if (!isConnected) {
     return (
       <div className="card text-center py-12">
@@ -68,28 +110,6 @@ export function StakeInfo({ onRescueClick }: StakeInfoProps) {
       </div>
     );
   }
-
-  const stakedBalance = data?.[0]?.result as bigint | undefined;
-  const unlockTime = data?.[1]?.result as bigint | undefined;
-  const canUnstake = data?.[2]?.result as boolean | undefined;
-  const tokenBalance = data?.[3]?.result as bigint | undefined;
-  const rescueEstimate = data?.[4]?.result as [bigint, bigint, bigint, boolean] | undefined;
-
-  const now = BigInt(Math.floor(Date.now() / 1000));
-  const isLocked = unlockTime ? unlockTime > now : false;
-  const timeLeft = unlockTime ? Number(unlockTime - now) : 0;
-  const hasStake = stakedBalance && stakedBalance > 0n;
-  const hasLowGas = ethBalance && ethBalance.value < BigInt(1e15); // < 0.001 ETH
-
-  const formatTime = (seconds: number) => {
-    if (seconds <= 0) return 'Unlocked!';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
-  };
 
   return (
     <div className="space-y-6">

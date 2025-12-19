@@ -1,23 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { Header } from '@/components/Header';
-import { StakeInfo } from '@/components/StakeInfo';
-import { RescueModal } from '@/components/RescueModal';
+import { StakePanel } from '@/components/StakePanel';
+import { RescuePanel, RescuePanelRef } from '@/components/RescuePanel';
+import { LiveActivityFeed, LiveActivityFeedRef } from '@/components/LiveActivityFeed';
 
 export default function Home() {
   const { isConnected } = useAccount();
-  const [showRescueModal, setShowRescueModal] = useState(false);
-  const [lastRescueTx, setLastRescueTx] = useState<string>('');
+  const rescuePanelRef = useRef<RescuePanelRef>(null);
+  const activityFeedRef = useRef<LiveActivityFeedRef>(null);
 
-  const handleRescueClick = () => {
-    setShowRescueModal(true);
-  };
+  // Refresh all data when stake completes
+  const handleStakeComplete = useCallback(() => {
+    // Refresh rescue panel data
+    rescuePanelRef.current?.refresh();
+    // Refresh activity feed
+    activityFeedRef.current?.refresh();
+  }, []);
 
-  const handleRescueSuccess = (txHash: string) => {
-    setLastRescueTx(txHash);
-  };
+  // Refresh activity feed when rescue completes
+  const handleRescueComplete = useCallback(() => {
+    activityFeedRef.current?.refresh();
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
@@ -65,7 +71,13 @@ export default function Home() {
 
         {/* Main Content */}
         {isConnected ? (
-          <StakeInfo onRescueClick={handleRescueClick} />
+          <div className="space-y-6 max-w-2xl mx-auto">
+            {/* Stake Panel - Always visible for testing */}
+            <StakePanel onStakeComplete={handleStakeComplete} />
+            
+            {/* Rescue Panel - Shows stake info and rescue flow */}
+            <RescuePanel ref={rescuePanelRef} onRescueComplete={handleRescueComplete} />
+          </div>
         ) : (
           <div className="card max-w-lg mx-auto text-center py-12">
             <div className="text-6xl mb-6">🔗</div>
@@ -79,20 +91,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* Last Rescue Success Banner */}
-        {lastRescueTx && (
-          <div className="mt-8 max-w-2xl mx-auto bg-green-900/30 border border-green-700 rounded-xl p-4 text-center">
-            <p className="text-green-400 font-medium">
-              ✅ Last rescue successful!{' '}
-              <a
-                href={`https://sepolia.etherscan.io/tx/${lastRescueTx}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-green-300"
-              >
-                View tx →
-              </a>
-            </p>
+        {/* Live Activity Feed - Shows real-time blockchain events */}
+        {isConnected && (
+          <div className="mt-8 max-w-2xl mx-auto">
+            <LiveActivityFeed ref={activityFeedRef} />
           </div>
         )}
 
@@ -154,12 +156,6 @@ export default function Home() {
           </p>
         </footer>
       </div>
-
-      <RescueModal
-        isOpen={showRescueModal}
-        onClose={() => setShowRescueModal(false)}
-        onSuccess={handleRescueSuccess}
-      />
     </main>
   );
 }
