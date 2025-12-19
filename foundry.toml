@@ -13,11 +13,11 @@ runs = 256
 max_test_rejects = 65536
 
 [rpc_endpoints]
-bsc_testnet = "${BSC_TESTNET_RPC}"
+sepolia = "${SEPOLIA_RPC}"
 localhost = "http://127.0.0.1:8545"
 
 [etherscan]
-bsc_testnet = { key = "${BSCSCAN_API_KEY}", url = "https://api-testnet.bscscan.com/api" }
+sepolia = { key = "${ETHERSCAN_API_KEY}", url = "https://api-sepolia.etherscan.io/api" }
 
 [fmt]
 line_length = 120

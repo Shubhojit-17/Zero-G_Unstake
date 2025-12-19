@@ -189,7 +189,7 @@ This will:
 forge script script/SetupTestUser.s.sol --rpc-url $BSC_TESTNET_RPC --broadcast
 ```
 
-**2. Wait for lock period (60 seconds by default)**
+**2. Wait for lock period (3600 seconds / 1 hour)**
 
 **3. Check status:**
 ```bash

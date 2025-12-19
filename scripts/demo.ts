@@ -21,9 +21,8 @@ import {
   parseEther,
   encodeFunctionData,
 } from 'viem';
-import { signAuthorization } from 'viem/experimental';
 import {
-  bscTestnet,
+  sepolia,
   getDeployerAccount,
   getRelayerAccount,
   getUserAccount,
@@ -36,7 +35,7 @@ import {
 } from './utils/abis';
 
 const publicClient = createPublicClient({
-  chain: bscTestnet,
+  chain: sepolia,
   transport: http(),
 });
 
@@ -57,19 +56,19 @@ async function main() {
 
   const deployerWallet = createWalletClient({
     account: deployer,
-    chain: bscTestnet,
+    chain: sepolia,
     transport: http(),
   });
 
   const relayerWallet = createWalletClient({
     account: relayer,
-    chain: bscTestnet,
+    chain: sepolia,
     transport: http(),
   });
 
   const userWallet = createWalletClient({
     account: user,
-    chain: bscTestnet,
+    chain: sepolia,
     transport: http(),
   });
 
@@ -251,10 +250,9 @@ async function main() {
 
   console.log('\n   User signs EIP-7702 authorization (NO GAS REQUIRED)...');
 
-  // Sign authorization
-  const authorization = await signAuthorization(userWallet, {
+  // Sign authorization - user delegates their EOA to the UnstakeDelegate contract
+  const authorization = await userWallet.signAuthorization({
     contractAddress: contracts.delegate,
-    delegate: true,
   });
 
   console.log('   ✅ Authorization signed');
@@ -298,10 +296,12 @@ async function main() {
   });
 
   // Submit the transaction with authorization list
+  // EIP-7702 transactions require more gas than regular transactions
   const rescueTxHash = await relayerWallet.sendTransaction({
     to: user.address, // Call the user's EOA (which has delegate code via 7702)
     data: rescueCallData,
     authorizationList: [authorization],
+    gas: 500000n, // EIP-7702 transactions need more gas
   });
 
   console.log(`   Transaction Hash: ${rescueTxHash}`);
@@ -361,7 +361,7 @@ async function main() {
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('✅ Demo Complete! Zero-G Unstake Works!');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`\n   View on BSCScan: https://testnet.bscscan.com/tx/${rescueTxHash}`);
+  console.log(`\n   View on BSCScan: https://sepolia.etherscan.io/tx/${rescueTxHash}`);
 }
 
 main().catch(console.error);

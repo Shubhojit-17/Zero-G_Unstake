@@ -17,9 +17,8 @@ import {
   parseEther,
   type Hex,
 } from 'viem';
-import { signAuthorization } from 'viem/experimental';
 import {
-  bscTestnet,
+  sepolia,
   getUserAccount,
   getContractAddresses,
 } from './utils/config';
@@ -32,7 +31,7 @@ import * as fs from 'fs';
 
 // Create clients
 const publicClient = createPublicClient({
-  chain: bscTestnet,
+  chain: sepolia,
   transport: http(),
 });
 
@@ -40,7 +39,7 @@ const userAccount = getUserAccount();
 
 const walletClient = createWalletClient({
   account: userAccount,
-  chain: bscTestnet,
+  chain: sepolia,
   transport: http(),
 });
 
@@ -119,16 +118,15 @@ async function signRescueAuthorization() {
 
   // Sign the authorization
   // This allows the user's EOA to temporarily use the delegate's code
-  const authorization = await signAuthorization(walletClient, {
+  const authorization = await walletClient.signAuthorization({
     contractAddress: contracts.delegate,
-    delegate: true,
   });
 
   console.log('   ✅ Authorization signed');
 
   return {
     contractAddress: contracts.delegate,
-    chainId: bscTestnet.id,
+    chainId: sepolia.id,
     nonce: BigInt(nonce),
     v: authorization.v,
     r: authorization.r,

@@ -14,7 +14,7 @@ import "../src/UnstakeDelegate.sol";
 contract Deploy is Script {
     // Configuration
     uint256 constant INITIAL_TOKEN_SUPPLY = 1_000_000 * 1e18; // 1 million tokens
-    uint256 constant LOCK_DURATION = 60; // 60 seconds for demo (use 3600 for 1 hour in production)
+    uint256 constant LOCK_DURATION = 3600; // 3600 seconds (1 hour) as per requirements
 
     function run() external {
         // Load deployer private key from environment

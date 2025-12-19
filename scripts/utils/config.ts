@@ -6,25 +6,25 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 /**
- * BSC Testnet chain definition with EIP-7702 support
+ * Sepolia Testnet chain definition with EIP-7702 support
  */
-export const bscTestnet = defineChain({
-  id: 97,
-  name: 'BSC Testnet',
+export const sepolia = defineChain({
+  id: 11155111,
+  name: 'Sepolia',
   nativeCurrency: {
     decimals: 18,
-    name: 'tBNB',
-    symbol: 'tBNB',
+    name: 'Sepolia ETH',
+    symbol: 'ETH',
   },
   rpcUrls: {
     default: {
-      http: [process.env.BSC_TESTNET_RPC || 'https://bsc-testnet-rpc.publicnode.com'],
+      http: [process.env.SEPOLIA_RPC || 'https://rpc.sepolia.org'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'BscScan Testnet',
-      url: 'https://testnet.bscscan.com',
+      name: 'Etherscan Sepolia',
+      url: 'https://sepolia.etherscan.io',
     },
   },
   testnet: true,

@@ -21,7 +21,7 @@ import {
   type TransactionReceipt,
 } from 'viem';
 import {
-  bscTestnet,
+  sepolia,
   getRelayerAccount,
   getContractAddresses,
 } from './utils/config';
@@ -51,7 +51,7 @@ interface RescueRequest {
 
 // Create clients
 const publicClient = createPublicClient({
-  chain: bscTestnet,
+  chain: sepolia,
   transport: http(),
 });
 
@@ -59,7 +59,7 @@ const relayerAccount = getRelayerAccount();
 
 const walletClient = createWalletClient({
   account: relayerAccount,
-  chain: bscTestnet,
+  chain: sepolia,
   transport: http(),
 });
 
@@ -249,7 +249,7 @@ async function processRescueRequest(request: RescueRequest) {
 
   if (result.success) {
     console.log('\n🎉 Rescue successful!');
-    console.log(`   Tx: https://testnet.bscscan.com/tx/${result.txHash}`);
+    console.log(`   Tx: https://sepolia.etherscan.io/tx/${result.txHash}`);
   } else {
     console.log(`\n❌ Rescue failed: ${result.error}`);
   }
