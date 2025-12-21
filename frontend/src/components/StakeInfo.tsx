@@ -122,9 +122,9 @@ export function StakeInfo({ onRescueClick }: StakeInfoProps) {
           </div>
         </div>
         <div className="card">
-          <div className="text-sm text-slate-400 mb-1">ETH for Gas</div>
+          <div className="text-sm text-slate-400 mb-1">BNB for Gas</div>
           <div className={`text-2xl font-bold ${hasLowGas ? 'text-amber-400' : ''}`}>
-            {ethBalance ? parseFloat(formatEther(ethBalance.value)).toFixed(4) : '0'} ETH
+            {ethBalance ? parseFloat(formatEther(ethBalance.value)).toFixed(4) : '0'} BNB
             {hasLowGas && <span className="text-sm ml-2">⚠️ Low</span>}
           </div>
         </div>
@@ -218,7 +218,7 @@ export function StakeInfo({ onRescueClick }: StakeInfoProps) {
             <div>
               <h4 className="font-semibold text-purple-300">Perfect for Zero-G!</h4>
               <p className="text-sm text-slate-400">
-                You have low ETH but tokens are ready to unstake. 
+                You have low BNB but tokens are ready to unstake. 
                 Use Zero-G Unstake to rescue your tokens without paying gas!
               </p>
             </div>

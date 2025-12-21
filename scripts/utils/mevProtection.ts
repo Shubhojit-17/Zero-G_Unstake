@@ -18,7 +18,7 @@ import {
   type Hash,
   type TransactionRequest,
 } from 'viem';
-import { sepolia } from './config';
+import { bscTestnet } from './config';
 
 // ============ Types ============
 
@@ -86,7 +86,7 @@ export class MevProtectedRelayer {
 
   constructor(
     account: Account,
-    chain: Chain = sepolia,
+    chain: Chain = bscTestnet,
     config: Partial<MevProtectionConfig> = {}
   ) {
     this.account = account;
@@ -217,7 +217,7 @@ export class MevProtectedRelayer {
  */
 export function createMevProtectedRelayer(
   account: Account,
-  chain: Chain = sepolia,
+  chain: Chain = bscTestnet,
   options?: Partial<MevProtectionConfig>
 ): MevProtectedRelayer {
   return new MevProtectedRelayer(account, chain, options);

@@ -3,7 +3,7 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc = "0.8.24"
-evm_version = "cancun"
+evm_version = "paris"
 optimizer = true
 optimizer_runs = 200
 via_ir = true
@@ -13,11 +13,11 @@ runs = 256
 max_test_rejects = 65536
 
 [rpc_endpoints]
-sepolia = "${SEPOLIA_RPC}"
+bsc_testnet = "${BSC_TESTNET_RPC}"
 localhost = "http://127.0.0.1:8545"
 
 [etherscan]
-sepolia = { key = "${ETHERSCAN_API_KEY}", url = "https://api-sepolia.etherscan.io/api" }
+bsc_testnet = { key = "${BSCSCAN_API_KEY}", url = "https://api-testnet.bscscan.com/api", chain = 97 }
 
 [fmt]
 line_length = 120

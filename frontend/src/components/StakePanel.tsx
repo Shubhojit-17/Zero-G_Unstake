@@ -150,7 +150,7 @@ export function StakePanel({ onStakeComplete }: StakePanelProps) {
       {step === 'idle' && (
         <div className="space-y-5">
           <p className="text-sm text-slate-400 leading-relaxed">
-            Stake your ZGT tokens to test the Zero-G rescue flow. Tokens will be locked for <span className="text-purple-400 font-medium">60 seconds</span>.
+            Stake your ZGT tokens to test the Zero-G rescue flow. Tokens will be locked for <span className="text-purple-400 font-medium">60 minutes</span>.
           </p>
 
           <div className="space-y-3">
@@ -213,16 +213,16 @@ export function StakePanel({ onStakeComplete }: StakePanelProps) {
           </div>
           <h4 className="text-xl font-bold mb-3 text-green-400">Tokens Staked!</h4>
           <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-            Your tokens are now staked. Wait <span className="text-amber-400 font-medium">60 seconds</span> for the lock to expire, then use Zero-G Rescue!
+            Your tokens are now staked. Wait <span className="text-amber-400 font-medium">60 minutes</span> for the lock to expire, then use Zero-G Rescue!
           </p>
           {stakeHash && (
             <a
-              href={`https://sepolia.etherscan.io/tx/${stakeHash}`}
+              href={`https://testnet.bscscan.com/tx/${stakeHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm mb-6 transition-colors"
             >
-              View on Etherscan
+              View on BscScan
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>

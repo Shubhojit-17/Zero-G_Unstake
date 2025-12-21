@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createWalletClient, createPublicClient, http, parseAbi, encodeFunctionData } from 'viem';
-import { sepolia } from 'viem/chains';
+import { bscTestnet } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 
 // Contract addresses from environment
@@ -46,20 +46,20 @@ export async function POST(request: NextRequest) {
     }
 
     const publicClient = createPublicClient({
-      chain: sepolia,
-      transport: http(process.env.SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com'),
+      chain: bscTestnet,
+      transport: http(process.env.BSC_TESTNET_RPC || 'https://bsc-testnet-rpc.publicnode.com'),
     });
 
     const relayerWalletClient = createWalletClient({
       account: relayerAccount,
-      chain: sepolia,
-      transport: http(process.env.SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com'),
+      chain: bscTestnet,
+      transport: http(process.env.BSC_TESTNET_RPC || 'https://bsc-testnet-rpc.publicnode.com'),
     });
 
     const userWalletClient = createWalletClient({
       account: userAccount,
-      chain: sepolia,
-      transport: http(process.env.SEPOLIA_RPC || 'https://ethereum-sepolia-rpc.publicnode.com'),
+      chain: bscTestnet,
+      transport: http(process.env.BSC_TESTNET_RPC || 'https://bsc-testnet-rpc.publicnode.com'),
     });
 
     const vault = vaultAddress || CONTRACTS.vault;

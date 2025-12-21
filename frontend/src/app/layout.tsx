@@ -7,9 +7,15 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Zero-G Unstake | Gasless Emergency Exit',
-  description: 'Unstake your tokens with zero gas using EIP-7702',
+  description: 'Unstake your tokens with zero gas using EIP-7702 on BNB Chain',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
+  openGraph: {
+    title: 'Zero-G Unstake',
+    description: 'Gasless emergency exit from staking contracts on BNB Chain',
+    images: ['/logo.png'],
   },
 };
 

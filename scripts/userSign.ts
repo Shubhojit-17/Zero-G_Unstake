@@ -18,7 +18,7 @@ import {
   type Hex,
 } from 'viem';
 import {
-  sepolia,
+  bscTestnet,
   getUserAccount,
   getContractAddresses,
 } from './utils/config';
@@ -31,7 +31,7 @@ import * as fs from 'fs';
 
 // Create clients
 const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 
@@ -39,7 +39,7 @@ const userAccount = getUserAccount();
 
 const walletClient = createWalletClient({
   account: userAccount,
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 
@@ -126,7 +126,7 @@ async function signRescueAuthorization() {
 
   return {
     contractAddress: contracts.delegate,
-    chainId: sepolia.id,
+    chainId: bscTestnet.id,
     nonce: BigInt(nonce),
     v: authorization.v,
     r: authorization.r,

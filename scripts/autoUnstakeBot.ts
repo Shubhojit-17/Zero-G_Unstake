@@ -26,7 +26,7 @@ import {
   type Log,
 } from 'viem';
 import {
-  sepolia,
+  bscTestnet,
   getRelayerAccount,
   getContractAddresses,
 } from './utils/config';
@@ -190,7 +190,7 @@ class AutoUnstakeBot {
     this.contracts = getContractAddresses();
 
     this.publicClient = createPublicClient({
-      chain: sepolia,
+      chain: bscTestnet,
       transport: http(),
     });
   }
@@ -264,7 +264,7 @@ class AutoUnstakeBot {
       // Create MEV-protected relayer
       const protectedRelayer = createMevProtectedRelayer(
         this.relayerAccount,
-        sepolia,
+        bscTestnet,
         this.config.mevProtection
       );
 
@@ -448,7 +448,7 @@ async function main() {
       // Example: npm run bot register <userAddress> <authJson>
       if (args.length < 3) {
         console.log('Usage: npm run bot register <userAddress> <authorizationJson>');
-        console.log('Example: npm run bot register 0x123... \'{"address":"0x...","chainId":11155111,...}\'');
+        console.log('Example: npm run bot register 0x123... \'{"address":"0x...","chainId":97,...}\'');
         process.exit(1);
       }
       const userAddress = args[1] as `0x${string}`;

@@ -1,8 +1,8 @@
 import { http, createConfig } from 'wagmi';
-import { sepolia } from 'wagmi/chains';
+import { bscTestnet } from 'wagmi/chains';
 import { getDefaultConfig } from 'connectkit';
 
-// Contract addresses (update after deployment)
+// Contract addresses (deployed on BSC Testnet)
 export const CONTRACTS = {
   token: '0xACDca6c55F4CBA946763413854341b9E5556212A' as `0x${string}`,
   vault: '0x5085d1DD5FbDA9166094C3a3dc41dea7Df8fD9e7' as `0x${string}`,
@@ -16,9 +16,9 @@ export const RELAYER_API = process.env.NEXT_PUBLIC_RELAYER_API || '/api';
 // Wagmi config with ConnectKit
 export const config = createConfig(
   getDefaultConfig({
-    chains: [sepolia],
+    chains: [bscTestnet],
     transports: {
-      [sepolia.id]: http('https://ethereum-sepolia-rpc.publicnode.com'),
+      [bscTestnet.id]: http('https://bsc-testnet-rpc.publicnode.com'),
     },
     walletConnectProjectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID || '',
     appName: 'Zero-G Unstake',

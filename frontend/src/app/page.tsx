@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { useAccount } from 'wagmi';
 import { Header } from '@/components/Header';
 import { StakePanel } from '@/components/StakePanel';
@@ -40,6 +41,16 @@ export default function Home() {
         <div className="container mx-auto px-4 py-16">
           {/* Hero Section */}
           <div className="text-center mb-16">
+            <div className="flex justify-center mb-6">
+              <Image 
+                src="/logo.png" 
+                alt="Zero-G Unstake Logo" 
+                width={120} 
+                height={120}
+                className="drop-shadow-2xl"
+                priority
+              />
+            </div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
               <span className="text-sm font-medium text-purple-400">✨ Powered by EIP-7702</span>
             </div>
@@ -50,7 +61,7 @@ export default function Home() {
               Gasless emergency exit from staking contracts.
               <br />
               <span className="text-purple-400 font-medium">
-                Rescue your tokens even with zero ETH for gas.
+                Rescue your tokens even with zero BNB for gas.
               </span>
             </p>
           </div>
@@ -61,7 +72,7 @@ export default function Home() {
               <div className="feature-icon">⛽</div>
               <h3 className="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors">Gasless</h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                No ETH needed. Relayers pay gas and take a small token fee.
+                No BNB needed. Relayers pay gas and take a small token fee.
               </p>
             </div>
             <div className="feature-card group">
@@ -98,7 +109,7 @@ export default function Home() {
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50">
                 <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                <span className="text-sm text-slate-400">Sepolia Testnet Required</span>
+                <span className="text-sm text-slate-400">BSC Testnet Required</span>
               </div>
             </div>
           )}

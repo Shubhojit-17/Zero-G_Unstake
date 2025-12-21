@@ -115,12 +115,12 @@ export function TransactionLog({ steps, isActive }: TransactionLogProps) {
 
                 {step.txHash && (
                   <a
-                    href={`https://sepolia.etherscan.io/tx/${step.txHash}`}
+                    href={`https://testnet.bscscan.com/tx/${step.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-purple-400 hover:text-purple-300 mt-2 inline-block"
                   >
-                    View on Etherscan →
+                    View on BscScan →
                   </a>
                 )}
               </div>

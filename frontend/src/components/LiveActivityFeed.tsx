@@ -215,7 +215,7 @@ export const LiveActivityFeed = forwardRef<LiveActivityFeedRef>(function LiveAct
               <div className="text-right">
                 <div className="font-mono font-semibold">{parseFloat(event.amount).toFixed(2)} <span className="text-purple-400">ZGT</span></div>
                 <a
-                  href={`https://sepolia.etherscan.io/tx/${event.txHash}`}
+                  href={`https://testnet.bscscan.com/tx/${event.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-slate-500 hover:text-purple-400 transition-colors inline-flex items-center gap-1 group-hover:text-purple-400"

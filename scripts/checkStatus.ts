@@ -12,7 +12,7 @@ import {
   formatEther,
 } from 'viem';
 import {
-  sepolia,
+  bscTestnet,
   getDeployerAccount,
   getRelayerAccount,
   getUserAccount,
@@ -25,7 +25,7 @@ import {
 } from './utils/abis';
 
 const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 

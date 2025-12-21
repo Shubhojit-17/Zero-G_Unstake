@@ -297,9 +297,9 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
           </div>
         </div>
         <div className="card">
-          <div className="text-sm text-slate-400 mb-1">ETH for Gas</div>
+          <div className="text-sm text-slate-400 mb-1">BNB for Gas</div>
           <div className={`text-2xl font-bold ${hasLowGas ? 'text-amber-400' : ''}`}>
-            {ethBalance ? parseFloat(formatEther(ethBalance.value)).toFixed(4) : '0'} ETH
+            {ethBalance ? parseFloat(formatEther(ethBalance.value)).toFixed(4) : '0'} BNB
             {hasLowGas && <span className="text-sm ml-2">⚠️ Low</span>}
           </div>
         </div>
@@ -352,17 +352,17 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
               </div>
             )}
           </div>
-        ) : (
+        ) : step !== 'success' ? (
           <div className="text-center py-8 text-slate-400">
             <div className="text-4xl mb-2">📭</div>
             <p>No active stake found</p>
             <p className="text-sm mt-2">Stake some ZGT tokens above to test the rescue flow!</p>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Rescue Flow Panel - Show for staked and unlocked tokens */}
-      {hasStake && !isLocked && canUnstake && (
+      {/* Rescue Flow Panel - Show for staked and unlocked tokens OR during active rescue flow */}
+      {((hasStake && !isLocked && canUnstake) || step === 'confirming' || step === 'submitting' || step === 'success' || step === 'error') && (
         <div className="card glow-green">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             🚀 Zero-G Rescue
@@ -464,13 +464,19 @@ export const RescuePanel = forwardRef<RescuePanelRef, RescuePanelProps>(function
               <p className="text-slate-400 mb-4">
                 Your tokens have been unstaked and sent to your wallet.
               </p>
+              {tokenBalance && (
+                <div className="bg-slate-900/50 rounded-lg p-4 mb-4 inline-block">
+                  <div className="text-sm text-slate-400 mb-1">New Wallet Balance</div>
+                  <div className="text-2xl font-bold text-green-400">{formatEther(tokenBalance)} ZGT</div>
+                </div>
+              )}
               <a
-                href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                href={`https://testnet.bscscan.com/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-purple-400 hover:text-purple-300 text-sm underline block mb-4"
               >
-                View on Etherscan →
+                View on BscScan →
               </a>
               <button onClick={handleReset} className="btn-primary px-8">
                 Done

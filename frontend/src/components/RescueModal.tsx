@@ -151,12 +151,12 @@ export function RescueModal({ isOpen, onClose, onSuccess }: RescueModalProps) {
               Your tokens have been unstaked and sent to your wallet.
             </p>
             <a
-              href={`https://sepolia.etherscan.io/tx/${txHash}`}
+              href={`https://testnet.bscscan.com/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 hover:text-purple-300 text-sm underline"
             >
-              View on Etherscan →
+              View on BscScan →
             </a>
             <button onClick={handleClose} className="w-full btn-primary mt-6">
               Done

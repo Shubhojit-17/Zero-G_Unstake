@@ -25,7 +25,7 @@ import {
   type TransactionReceipt,
 } from 'viem';
 import {
-  sepolia,
+  bscTestnet,
   getRelayerAccount,
   getContractAddresses,
 } from './utils/config';
@@ -59,7 +59,7 @@ interface RescueRequest {
 
 // Create clients
 const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 
@@ -67,7 +67,7 @@ const relayerAccount = getRelayerAccount();
 
 const walletClient = createWalletClient({
   account: relayerAccount,
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 
@@ -175,7 +175,7 @@ async function executeRescue(request: RescueRequest): Promise<{
 
   try {
     // Create MEV-protected relayer
-    const protectedRelayer = createMevProtectedRelayer(relayerAccount, sepolia, mevConfig);
+    const protectedRelayer = createMevProtectedRelayer(relayerAccount, bscTestnet, mevConfig);
     
     // Encode the executeRescue call data
     const callData = encodeFunctionData({
@@ -276,7 +276,7 @@ async function processRescueRequest(request: RescueRequest) {
 
   if (result.success) {
     console.log('\n🎉 Rescue successful!');
-    console.log(`   Tx: https://sepolia.etherscan.io/tx/${result.txHash}`);
+    console.log(`   Tx: https://testnet.bscscan.com/tx/${result.txHash}`);
   } else {
     console.log(`\n❌ Rescue failed: ${result.error}`);
   }

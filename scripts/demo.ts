@@ -22,7 +22,7 @@ import {
   encodeFunctionData,
 } from 'viem';
 import {
-  sepolia,
+  bscTestnet,
   getDeployerAccount,
   getRelayerAccount,
   getUserAccount,
@@ -36,7 +36,7 @@ import {
 import { createMevProtectedRelayer } from './utils/mevProtection';
 
 const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: bscTestnet,
   transport: http(),
 });
 
@@ -57,19 +57,19 @@ async function main() {
 
   const deployerWallet = createWalletClient({
     account: deployer,
-    chain: sepolia,
+    chain: bscTestnet,
     transport: http(),
   });
 
   const relayerWallet = createWalletClient({
     account: relayer,
-    chain: sepolia,
+    chain: bscTestnet,
     transport: http(),
   });
 
   const userWallet = createWalletClient({
     account: user,
-    chain: sepolia,
+    chain: bscTestnet,
     transport: http(),
   });
 
@@ -290,7 +290,7 @@ async function main() {
   console.log('\n   Submitting EIP-7702 rescue transaction with MEV protection...');
 
   // Create MEV-protected relayer
-  const mevRelayer = createMevProtectedRelayer(relayer, sepolia, {
+  const mevRelayer = createMevProtectedRelayer(relayer, bscTestnet, {
     enabled: true,
     provider: 'mev-blocker',
     fallbackToPublic: true,
@@ -371,7 +371,7 @@ async function main() {
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('✅ Demo Complete! Zero-G Unstake Works!');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`\n   View on Etherscan: https://sepolia.etherscan.io/tx/${rescueResult.hash}`);
+  console.log(`\n   View on BscScan: https://testnet.bscscan.com/tx/${rescueResult.hash}`);
 }
 
 main().catch(console.error);
